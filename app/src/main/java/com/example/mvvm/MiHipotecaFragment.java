@@ -1,4 +1,4 @@
-package com.example.mvvm.ui.theme;
+package com.example.mvvm;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

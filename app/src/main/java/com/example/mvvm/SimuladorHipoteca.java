@@ -1,4 +1,4 @@
-package com.example.mvvm.ui.theme;
+package com.example.mvvm;
 
 public class SimuladorHipoteca {
 

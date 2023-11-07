@@ -1,9 +1,8 @@
-package com.example.mvvm.ui.theme;
+package com.example.mvvm;
 
 import android.app.Application;
 
 import androidx.annotation.NonNull;
-import androidx.compose.runtime.snapshots.Snapshot;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
