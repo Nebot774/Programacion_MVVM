@@ -1,6 +1,7 @@
 package com.example.mvvm;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,9 @@ import com.example.mvvm.databinding.FragmentMiHipotecaBinding;
 
 public class MiHipotecaFragment extends Fragment {
     private FragmentMiHipotecaBinding binding;
+    private MiHipotecaViewModel miHipotecaViewModel;
+    private double capital;
+    private int plazo;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -25,38 +29,38 @@ public class MiHipotecaFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final MiHipotecaViewModel miHipotecaViewModel = new ViewModelProvider(this).get(MiHipotecaViewModel.class);
+        miHipotecaViewModel = new ViewModelProvider(this).get(MiHipotecaViewModel.class);
 
         binding.calcular.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                boolean error = false;
+                Log.d("MiHipotecaFragment", "Botón calcular presionado");
 
-                double capital = Double.parseDouble(binding.capital.getText().toString());
-                int plazo = Integer.parseInt(binding.plazo.getText().toString());
+                try {
+                    capital = Double.parseDouble(binding.capital.getText().toString());
+                } catch (Exception e){
+                    binding.capital.setError("Introduzca un número");
+                    error = true;
+                }
 
-                miHipotecaViewModel.calcular(capital, plazo);
-            }
-        });
+                try {
+                    plazo = Integer.parseInt(binding.plazo.getText().toString());
+                } catch (Exception e){
+                    binding.plazo.setError("Introduzca un número");
+                    error = true;
+                }
 
-        miHipotecaViewModel.errorCapital.observe(getViewLifecycleOwner(), new Observer<Double>() {
-            @Override
-            public void onChanged(Double capitalMinimo) {
-                if (capitalMinimo != null) {
-                    binding.capital.setError("El capital no puede ser inferor a " + capitalMinimo + " euros");
-                } else {
-                    binding.capital.setError(null);
+                if (!error) {
+                    miHipotecaViewModel.calcular(capital, plazo);
                 }
             }
         });
 
-        miHipotecaViewModel.errorPlazos.observe(getViewLifecycleOwner(), new Observer<Integer>() {
+        miHipotecaViewModel.cuota.observe(getViewLifecycleOwner(), new Observer<Double>() {
             @Override
-            public void onChanged(Integer plazoMinimo) {
-                if (plazoMinimo != null) {
-                    binding.plazo.setError("El plazo no puede ser inferior a " + plazoMinimo + " años");
-                } else {
-                    binding.plazo.setError(null);
-                }
+            public void onChanged(Double cuota) {
+                binding.cuota.setText(String.format("%.2f",cuota));
             }
         });
 
@@ -73,5 +77,26 @@ public class MiHipotecaFragment extends Fragment {
             }
         });
 
+        miHipotecaViewModel.errorCapital.observe(getViewLifecycleOwner(), new Observer<Double>() {
+            @Override
+            public void onChanged(Double capitalMinimo) {
+                if (capitalMinimo != null) {
+                    binding.capital.setError("El capital no puede ser inferor a " + capitalMinimo);
+                } else {
+                    binding.capital.setError(null);
+                }
+            }
+        });
+
+        miHipotecaViewModel.errorPlazos.observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer plazoMinimo) {
+                if (plazoMinimo != null) {
+                    binding.plazo.setError("El plazo no puede ser inferior a " + plazoMinimo + " años");
+                } else {
+                    binding.plazo.setError(null);
+                }
+            }
+        });
     }
 }
